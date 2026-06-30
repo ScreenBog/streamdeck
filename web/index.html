@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#08080c">
+  <title>Deck</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="auth-screen" class="auth-screen hidden">
+    <div class="auth-card">
+      <div class="auth-logo">◆ Deck</div>
+      <p>Введите PIN с экрана ПК</p>
+      <input type="text" id="pin-input" maxlength="8" placeholder="PIN" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button id="pin-submit" class="btn primary">Войти</button>
+      <p id="pin-error" class="error hidden">Неверный PIN</p>
+    </div>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="header">
+      <div class="header-left">
+        <div id="brand-mark" class="brand-mark">◆</div>
+        <h1 id="deck-title">Deck</h1>
+        <span id="conn-status" class="status offline">●</span>
+      </div>
+      <div id="sys-status" class="sys-status" title="Нагрузка ПК"></div>
+      <div class="header-right">
+        <button id="btn-edit" class="btn icon" title="Редактировать">✏️</button>
+        <button id="btn-settings" class="btn icon" title="Настройки">⚙️</button>
+      </div>
+    </header>
+
+    <nav id="page-tabs" class="page-tabs"></nav>
+
+    <main class="deck-area">
+      <div id="music-full-panel" class="music-full hidden">
+        <div class="ym-hero">
+          <div class="ym-art">♫</div>
+          <div class="ym-now">
+            <div class="ym-label">Сейчас играет</div>
+            <div id="ym-artist" class="ym-artist">—</div>
+            <div id="ym-track" class="ym-track">—</div>
+            <div id="ym-status" class="ym-sub"><span id="ym-playing-dot" class="ym-dot"></span> Браузер · music.yandex.ru</div>
+          </div>
+        </div>
+        <div class="ym-transport">
+          <button class="ym-btn" data-ym="prev">⏮</button>
+          <button class="ym-btn ym-play" data-ym="play_pause">⏯</button>
+          <button class="ym-btn" data-ym="next">⏭</button>
+          <button class="ym-btn" data-ym="like">❤️</button>
+        </div>
+        <div class="ym-search-row">
+          <input type="text" id="ym-search" placeholder="Найти трек, альбом, исполнителя…">
+          <button id="ym-search-btn" class="btn primary">🔍</button>
+        </div>
+        <div class="ym-quick">
+          <button class="ym-tile" data-ym="browser">🌐 Открыть / фокус</button>
+          <button class="ym-tile" data-ym="focus">🎯 Только фокус</button>
+          <button class="ym-tile" data-ym="my_wave">🎲 Моя волна</button>
+          <button class="ym-tile" data-ym="collection">❤️ Коллекция</button>
+          <button class="ym-tile" data-ym="playlists">📋 Плейлисты</button>
+          <button class="ym-tile" data-ym="charts">📈 Чарты</button>
+          <button class="ym-tile" data-ym="podcasts">🎙 Подкасты</button>
+          <button class="ym-tile" data-ym="new_releases">🆕 Новинки</button>
+          <button class="ym-tile" data-ym="history">🕐 История</button>
+        </div>
+        <div class="ym-vol">
+          <button class="ym-vol-btn" data-ym="volume_down">🔉</button>
+          <input type="range" id="ym-volume" min="0" max="100" value="50">
+          <button class="ym-vol-btn" data-ym="volume_up">🔊</button>
+          <button class="ym-vol-btn" data-ym="mute">🔇</button>
+        </div>
+        <a class="ym-phone-link" href="https://music.yandex.ru" target="_blank" rel="noopener">Открыть Я.Музыку на этом устройстве ↗</a>
+      </div>
+
+      <div id="music-bar" class="music-bar hidden">
+        <div class="music-bar-icon">♫</div>
+        <div class="music-bar-info">
+          <div class="music-bar-title">Яндекс Музыка</div>
+          <div class="music-bar-sub" id="music-bar-sub">Управление с телефона</div>
+        </div>
+        <div class="music-bar-controls">
+          <button class="music-mini-btn" data-ym="prev" title="Назад">⏮</button>
+          <button class="music-mini-btn play" data-ym="play_pause" title="Play/Pause">⏯</button>
+          <button class="music-mini-btn" data-ym="next" title="Далее">⏭</button>
+        </div>
+      </div>
+
+      <div class="deck-chassis">
+        <div id="deck-grid" class="deck-grid"></div>
+      </div>
+    </main>
+
+    <div id="edit-bar" class="edit-bar hidden">
+      <button id="btn-add" class="btn">+ Кнопка</button>
+      <button id="btn-add-page" class="btn">+ Страница</button>
+      <button id="btn-done" class="btn primary">Готово</button>
+    </div>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2 id="modal-title">Редактировать кнопку</h2>
+      <form id="btn-form">
+        <input type="hidden" id="f-id">
+        <div class="field-row">
+          <label>Название</label>
+          <input type="text" id="f-label" maxlength="20">
+        </div>
+        <div class="field-row">
+          <label>Иконка (emoji)</label>
+          <input type="text" id="f-icon" maxlength="4">
+        </div>
+        <div class="field-row">
+          <label>Цвет</label>
+          <input type="color" id="f-color" value="#1a1a2e">
+        </div>
+        <div class="field-row">
+          <label>Тип действия</label>
+          <select id="f-type">
+            <option value="none">Пустая</option>
+            <option value="hotkey">Горячая клавиша</option>
+            <option value="yandex">Яндекс Музыка</option>
+            <option value="app">Приложение</option>
+            <option value="url">URL</option>
+            <option value="shell">Shell-команда</option>
+            <option value="text">Ввод текста</option>
+            <option value="media">Медиа</option>
+            <option value="system">Система</option>
+            <option value="window">Окна</option>
+            <option value="screenshot">Скриншот</option>
+            <option value="clipboard">Буфер обмена</option>
+            <option value="mouse">Мышь</option>
+            <option value="obs">OBS</option>
+            <option value="macro">Макрос</option>
+            <option value="folder">Папка (страница)</option>
+            <option value="path">Открыть файл/папку</option>
+          </select>
+        </div>
+        <div class="field-row hidden" id="f-preset-row">
+          <label>Быстрый выбор</label>
+          <select id="f-preset"></select>
+        </div>
+        <div class="field-row">
+          <label id="f-value-label">Значение</label>
+          <input type="text" id="f-value" placeholder="">
+          <textarea id="f-value-area" class="hidden" rows="3"></textarea>
+          <select id="f-value-select" class="hidden"></select>
+        </div>
+        <div class="field-row coords">
+          <label>Позиция</label>
+          <div class="coord-inputs">
+            <span>Столбец <input type="number" id="f-col" min="0" max="9" value="0"></span>
+            <span>Строка <input type="number" id="f-row" min="0" max="9" value="0"></span>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-delete" class="btn danger">Удалить</button>
+          <button type="button" id="btn-cancel" class="btn">Отмена</button>
+          <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="settings-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Настройки Deck</h2>
+      <form id="settings-form">
+        <div class="field-row">
+          <label>Название</label>
+          <input type="text" id="s-title" maxlength="30">
+        </div>
+        <div class="field-row">
+          <label>Столбцов</label>
+          <input type="number" id="s-cols" min="1" max="10" value="5">
+        </div>
+        <div class="field-row">
+          <label>Строк</label>
+          <input type="number" id="s-rows" min="1" max="10" value="3">
+        </div>
+        <div class="field-row">
+          <label>PIN (пусто = без пароля)</label>
+          <input type="text" id="s-pin" maxlength="8" autocomplete="off">
+        </div>
+        <div class="field-row">
+          <label>OBS WebSocket пароль</label>
+          <input type="text" id="s-obs-pass" autocomplete="off" placeholder="из OBS → Инструменты → WebSocket">
+        </div>
+        <div class="field-row">
+          <label>Яндекс Музыка</label>
+          <select id="s-ym-mode">
+            <option value="browser">Браузер (Chrome/Edge)</option>
+            <option value="app">Десктоп-приложение</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>Браузер для музыки</label>
+          <select id="s-browser">
+            <option value="auto">Авто</option>
+            <option value="chrome">Chrome</option>
+            <option value="edge">Edge</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label>Акцент Deck</label>
+          <input type="color" id="s-accent" value="#7c6cf0">
+        </div>
+        <div class="field-row">
+          <label>Акцент Я.Музыки</label>
+          <input type="color" id="s-ym-accent" value="#ffcc00">
+        </div>
+        <div class="field-row">
+          <label>Скругление кнопок</label>
+          <input type="range" id="s-radius" min="8" max="28" value="16">
+        </div>
+        <div class="field-row">
+          <label><input type="checkbox" id="s-glow" checked> Свечение кнопок</label>
+        </div>
+        <div class="field-row">
+          <label><input type="checkbox" id="s-compact"> Компактные кнопки</label>
+        </div>
+        <div class="field-row settings-io">
+          <button type="button" id="s-export" class="btn">Экспорт JSON</button>
+          <label class="btn file-btn">Импорт JSON<input type="file" id="s-import" accept=".json" hidden></label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="s-cancel" class="btn">Отмена</button>
+          <button type="submit" class="btn primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

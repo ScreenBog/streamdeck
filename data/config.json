@@ -1,0 +1,455 @@
+{
+  "settings": {
+    "pin": "",
+    "port": 8765,
+    "gridCols": 5,
+    "gridRows": 3,
+    "theme": "dark",
+    "title": "My Deck",
+    "obs": {
+      "host": "localhost",
+      "port": 4455,
+      "password": ""
+    },
+    "yandex": {
+      "mode": "browser",
+      "browser": "auto"
+    },
+    "customize": {
+      "accent": "#7c6cf0",
+      "ymAccent": "#ffcc00",
+      "btnRadius": 16,
+      "glow": true,
+      "compact": false
+    }
+  },
+  "activePage": "main",
+  "pages": [
+    {
+      "id": "main",
+      "name": "Главная",
+      "buttons": [
+        {
+          "id": "b1",
+          "col": 0,
+          "row": 0,
+          "label": "Chrome",
+          "icon": "🌐",
+          "color": "#1e3a5f",
+          "action": { "type": "app", "value": "chrome" }
+        },
+        {
+          "id": "b2",
+          "col": 1,
+          "row": 0,
+          "label": "Discord",
+          "icon": "💬",
+          "color": "#5865f2",
+          "action": { "type": "app", "value": "discord" }
+        },
+        {
+          "id": "b3",
+          "col": 2,
+          "row": 0,
+          "label": "Vol +",
+          "icon": "🔊",
+          "color": "#2d4a22",
+          "action": { "type": "media", "value": "volume_up" }
+        },
+        {
+          "id": "b4",
+          "col": 3,
+          "row": 0,
+          "label": "Mute",
+          "icon": "🔇",
+          "color": "#4a2d2d",
+          "action": { "type": "media", "value": "mute" }
+        },
+        {
+          "id": "b5",
+          "col": 4,
+          "row": 0,
+          "label": "Play",
+          "icon": "⏯",
+          "color": "#3d2d4a",
+          "action": { "type": "media", "value": "play_pause" }
+        },
+        {
+          "id": "b6",
+          "col": 0,
+          "row": 1,
+          "label": "Win+D",
+          "icon": "🖥",
+          "color": "#2a2a3a",
+          "action": { "type": "system", "value": "show_desktop" }
+        },
+        {
+          "id": "b7",
+          "col": 1,
+          "row": 1,
+          "label": "Alt+Tab",
+          "icon": "⇥",
+          "color": "#2a2a3a",
+          "action": { "type": "window", "value": "switch" }
+        },
+        {
+          "id": "b8",
+          "col": 2,
+          "row": 1,
+          "label": "Скрин",
+          "icon": "📸",
+          "color": "#1a3a4a",
+          "action": { "type": "screenshot", "value": "screen" }
+        },
+        {
+          "id": "b9",
+          "col": 3,
+          "row": 1,
+          "label": "YouTube",
+          "icon": "▶️",
+          "color": "#5c1a1a",
+          "action": { "type": "url", "value": "https://youtube.com" }
+        },
+        {
+          "id": "b10",
+          "col": 4,
+          "row": 1,
+          "label": "Lock",
+          "icon": "🔒",
+          "color": "#3a2a1a",
+          "action": { "type": "system", "value": "lock" }
+        },
+        {
+          "id": "b11",
+          "col": 0,
+          "row": 2,
+          "label": "Стрим",
+          "icon": "📁",
+          "color": "#4a1a3a",
+          "action": { "type": "folder", "value": "stream" }
+        },
+        {
+          "id": "b12",
+          "col": 1,
+          "row": 2,
+          "label": "Я.Музыка",
+          "icon": "♫",
+          "color": "#3d3200",
+          "action": { "type": "folder", "value": "music" }
+        },
+        {
+          "id": "b13",
+          "col": 2,
+          "row": 2,
+          "label": "Копир.",
+          "icon": "📋",
+          "color": "#3a3a2a",
+          "action": { "type": "hotkey", "value": ["ctrl", "c"] }
+        },
+        {
+          "id": "b14",
+          "col": 3,
+          "row": 2,
+          "label": "Вставить",
+          "icon": "📄",
+          "color": "#3a3a2a",
+          "action": { "type": "hotkey", "value": ["ctrl", "v"] }
+        },
+        {
+          "id": "b15",
+          "col": 4,
+          "row": 2,
+          "label": "Закрыть",
+          "icon": "✕",
+          "color": "#4a2020",
+          "action": { "type": "window", "value": "close" }
+        }
+      ]
+    },
+    {
+      "id": "stream",
+      "name": "Стрим",
+      "theme": "stream",
+      "buttons": [
+        {
+          "id": "s1",
+          "col": 0,
+          "row": 0,
+          "label": "Стрим",
+          "icon": "🔴",
+          "color": "#5c1a1a",
+          "action": { "type": "obs", "value": "toggle_stream" }
+        },
+        {
+          "id": "s2",
+          "col": 1,
+          "row": 0,
+          "label": "Запись",
+          "icon": "⏺",
+          "color": "#4a1a1a",
+          "action": { "type": "obs", "value": "toggle_record" }
+        },
+        {
+          "id": "s3",
+          "col": 2,
+          "row": 0,
+          "label": "OBS",
+          "icon": "🎬",
+          "color": "#1a1a2e",
+          "action": { "type": "app", "value": "C:\\Program Files\\obs-studio\\bin\\64bit\\obs64.exe" }
+        },
+        {
+          "id": "s4",
+          "col": 3,
+          "row": 0,
+          "label": "Скрин",
+          "icon": "📸",
+          "color": "#1a3a4a",
+          "action": { "type": "screenshot", "value": "window" }
+        },
+        {
+          "id": "s5",
+          "col": 4,
+          "row": 0,
+          "label": "Win+D",
+          "icon": "🖥",
+          "color": "#2a2a3a",
+          "action": { "type": "system", "value": "show_desktop" }
+        },
+        {
+          "id": "s6",
+          "col": 0,
+          "row": 1,
+          "label": "D-Mute",
+          "icon": "🔇",
+          "color": "#5865f2",
+          "action": { "type": "hotkey", "value": ["ctrl", "shift", "d"] }
+        },
+        {
+          "id": "s7",
+          "col": 1,
+          "row": 1,
+          "label": "D-Deaf",
+          "icon": "🙉",
+          "color": "#5865f2",
+          "action": { "type": "hotkey", "value": ["ctrl", "shift", "a"] }
+        },
+        {
+          "id": "s8",
+          "col": 2,
+          "row": 1,
+          "label": "Микро",
+          "icon": "🎤",
+          "color": "#2a3a4a",
+          "action": { "type": "media", "value": "mic_mute" }
+        },
+        {
+          "id": "s9",
+          "col": 3,
+          "row": 1,
+          "label": "Слева",
+          "icon": "◧",
+          "color": "#2a3a3a",
+          "action": { "type": "window", "value": "snap_left" }
+        },
+        {
+          "id": "s10",
+          "col": 4,
+          "row": 1,
+          "label": "Справа",
+          "icon": "◨",
+          "color": "#2a3a3a",
+          "action": { "type": "window", "value": "snap_right" }
+        },
+        {
+          "id": "s11",
+          "col": 0,
+          "row": 2,
+          "label": "Назад",
+          "icon": "↩",
+          "color": "#3a2a4a",
+          "action": { "type": "folder", "value": "main" }
+        },
+        {
+          "id": "s12",
+          "col": 1,
+          "row": 2,
+          "label": "Корзина",
+          "icon": "🗑",
+          "color": "#2a4a2a",
+          "action": { "type": "system", "value": "empty_trash" }
+        },
+        {
+          "id": "s13",
+          "col": 2,
+          "row": 2,
+          "label": "Окно?",
+          "icon": "🪟",
+          "color": "#3a3a4a",
+          "action": { "type": "system", "value": "active_window" }
+        },
+        {
+          "id": "s14",
+          "col": 3,
+          "row": 2,
+          "label": "TaskMgr",
+          "icon": "📋",
+          "color": "#2a2a4a",
+          "action": { "type": "system", "value": "taskmgr" }
+        },
+        {
+          "id": "s15",
+          "col": 4,
+          "row": 2,
+          "label": "Буфер",
+          "icon": "📋",
+          "color": "#4a3a2a",
+          "action": { "type": "clipboard", "value": "get" }
+        }
+      ]
+    },
+    {
+      "id": "music",
+      "name": "Я.Музыка",
+      "theme": "yandex",
+      "layout": "music",
+      "buttons": [
+        {
+          "id": "m1",
+          "col": 0,
+          "row": 0,
+          "label": "Открыть",
+          "icon": "🟡",
+          "color": "#4a3d00",
+          "action": { "type": "yandex", "value": "open" }
+        },
+        {
+          "id": "m2",
+          "col": 1,
+          "row": 0,
+          "label": "Play",
+          "icon": "⏯",
+          "color": "#5c4a00",
+          "action": { "type": "yandex", "value": "play_pause" }
+        },
+        {
+          "id": "m3",
+          "col": 2,
+          "row": 0,
+          "label": "Далее",
+          "icon": "⏭",
+          "color": "#3d3300",
+          "action": { "type": "yandex", "value": "next" }
+        },
+        {
+          "id": "m4",
+          "col": 3,
+          "row": 0,
+          "label": "Назад",
+          "icon": "⏮",
+          "color": "#3d3300",
+          "action": { "type": "yandex", "value": "prev" }
+        },
+        {
+          "id": "m5",
+          "col": 4,
+          "row": 0,
+          "label": "Волна",
+          "icon": "🎲",
+          "color": "#6b5200",
+          "action": { "type": "yandex", "value": "my_wave" }
+        },
+        {
+          "id": "m6",
+          "col": 0,
+          "row": 1,
+          "label": "Любимое",
+          "icon": "❤️",
+          "color": "#5c1a30",
+          "action": { "type": "yandex", "value": "collection" }
+        },
+        {
+          "id": "m7",
+          "col": 1,
+          "row": 1,
+          "label": "Плейлисты",
+          "icon": "📋",
+          "color": "#3d3d00",
+          "action": { "type": "yandex", "value": "playlists" }
+        },
+        {
+          "id": "m8",
+          "col": 2,
+          "row": 1,
+          "label": "История",
+          "icon": "🕐",
+          "color": "#333300",
+          "action": { "type": "yandex", "value": "history" }
+        },
+        {
+          "id": "m9",
+          "col": 3,
+          "row": 1,
+          "label": "Чарты",
+          "icon": "📈",
+          "color": "#4a4000",
+          "action": { "type": "yandex", "value": "charts" }
+        },
+        {
+          "id": "m10",
+          "col": 4,
+          "row": 1,
+          "label": "Vol+",
+          "icon": "🔊",
+          "color": "#2a3a00",
+          "action": { "type": "yandex", "value": "volume_up" }
+        },
+        {
+          "id": "m11",
+          "col": 0,
+          "row": 2,
+          "label": "Назад",
+          "icon": "↩",
+          "color": "#3a2a4a",
+          "action": { "type": "folder", "value": "main" }
+        },
+        {
+          "id": "m12",
+          "col": 1,
+          "row": 2,
+          "label": "Веб",
+          "icon": "🌐",
+          "color": "#3d3500",
+          "action": { "type": "yandex", "value": "web" }
+        },
+        {
+          "id": "m13",
+          "col": 2,
+          "row": 2,
+          "label": "Vol-",
+          "icon": "🔉",
+          "color": "#2a3a00",
+          "action": { "type": "yandex", "value": "volume_down" }
+        },
+        {
+          "id": "m14",
+          "col": 3,
+          "row": 2,
+          "label": "Поиск",
+          "icon": "🔍",
+          "color": "#4a4a00",
+          "action": { "type": "yandex", "value": "search", "query": "плейлист дня" }
+        },
+        {
+          "id": "m15",
+          "col": 4,
+          "row": 2,
+          "label": "Фокус",
+          "icon": "🎯",
+          "color": "#5c5000",
+          "action": { "type": "yandex", "value": "focus" }
+        }
+      ]
+    }
+  ]
+}
