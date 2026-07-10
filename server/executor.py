@@ -1,4 +1,4 @@
-"""Выполнение действий кнопок Deck на Windows."""
+"""Выполнение действий кнопок Deck на Windows. Улучшенная версия с логированием и мощным macro."""
 
 from __future__ import annotations
 
@@ -15,6 +15,7 @@ from typing import Any
 import pyperclip
 
 from . import keyboard_win
+from .logger import logger
 from .obs_ctrl import run_obs
 from .yandex_music import run as run_yandex_music
 
@@ -28,35 +29,30 @@ def execute(action: dict[str, Any], settings: dict[str, Any] | None = None) -> d
     settings = settings or {}
 
     handlers = {
-        "hotkey": _hotkey,
-        "app": _app,
-        "url": _url,
-        "shell": _shell,
-        "text": _text,
-        "media": _media,
-        "system": _system,
-        "path": _path,
-        "macro": _macro,
-        "folder": _folder,
-        "screenshot": _screenshot,
-        "clipboard": _clipboard,
-        "mouse": _mouse,
-        "window": _window,
-        "obs": _obs,
-        "yandex": _yandex,
-        "none": _none,
+        "hotkey": _hotkey, "app": _app, "url": _url, "shell": _shell,
+        "text": _text, "media": _media, "system": _system, "path": _path,
+        "macro": _macro, "folder": _folder, "screenshot": _screenshot,
+        "clipboard": _clipboard, "mouse": _mouse, "window": _window,
+        "obs": _obs, "yandex": _yandex, "none": _none,
     }
 
     handler = handlers.get(action_type)
     if not handler:
+        logger.warning("Неизвестный тип действия: {}", action_type)
         return {"ok": False, "message": f"Неизвестный тип: {action_type}"}
 
     try:
+        logger.debug("▶️ Выполняю {} | value={}", action_type, str(value)[:100])
         result = handler(value, action, settings)
         if isinstance(result, dict):
-            return {"ok": True, **result}
-        return {"ok": True, "message": result}
+            final = {"ok": True, **result}
+        else:
+            final = {"ok": True, "message": result}
+        logger.info("✅ {} → {}", action_type, final.get("message", "")[:120])
+        return final
     except Exception as e:
+        logger.error("❌ Ошибка в {}: {}", action_type, e)
+        logger.exception(e)
         return {"ok": False, "message": str(e)}
 
 
@@ -105,12 +101,9 @@ def _shell(value: Any, action: dict, _settings: dict) -> str:
     cmd = str(value).strip()
     if not cmd:
         raise ValueError("shell: пустая команда")
-
     timeout = int(action.get("timeout", 30))
-    result = subprocess.run(
-        cmd, shell=True, capture_output=True, text=True,
-        timeout=timeout, encoding="utf-8", errors="replace",
-    )
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                            timeout=timeout, encoding="utf-8", errors="replace")
     out = (result.stdout or result.stderr or "(пусто)").strip()
     if len(out) > 500:
         out = out[:500] + "…"
@@ -201,19 +194,33 @@ def _macro(value: Any, action: dict, settings: dict) -> str:
     steps = value if isinstance(value, list) else action.get("steps", [])
     if not steps:
         raise ValueError("macro: пустой список шагов")
+
     results = []
-    for step in steps:
+    for idx, step in enumerate(steps):
         if isinstance(step, str):
             time.sleep(float(step) / 1000)
+            logger.debug("  macro[{}]: задержка {} мс", idx, step)
             continue
+
         delay = step.get("delay", 0)
         if delay:
             time.sleep(delay / 1000)
-        sub = execute(step, settings)
-        if sub.get("navigate"):
-            return sub
-        results.append(sub.get("message", ""))
-    return " → ".join(r for r in results if r)[:200]
+
+        repeat = int(step.get("repeat", 1))
+        for r in range(repeat):
+            sub = execute(step, settings)
+            if sub.get("navigate"):
+                return sub.get("message", "")
+            msg = sub.get("message", "")
+            if not sub.get("ok", True):
+                logger.warning("  macro[{}][repeat {}] ошибка: {}", idx, r, msg)
+            else:
+                logger.debug("  macro[{}][repeat {}] → {}", idx, r, msg[:80] if msg else "")
+            results.append(msg)
+
+    final_msg = " → ".join(r for r in results if r)[:200]
+    logger.success("Macro выполнен: {}", final_msg)
+    return final_msg
 
 
 def _folder(value: Any, _action: dict, _settings: dict) -> dict:
@@ -257,9 +264,9 @@ def _screenshot(value: Any, _action: dict, _settings: dict) -> str:
                 img.save(buf, format="PNG")
                 _image_to_clipboard(buf.getvalue())
                 return "📸 В буфер обмена"
-            except ImportError:
+            except Exception:
                 img.save(path)
-                return f"📸 {path.name} (pip install pywin32 для буфера)"
+                return f"📸 {path.name} (нужен pywin32 для буфера)"
         os.startfile(SCREENSHOT_DIR)
         return f"📸 {path.name}"
 
@@ -267,7 +274,6 @@ def _screenshot(value: Any, _action: dict, _settings: dict) -> str:
 def _image_to_clipboard(png_bytes: bytes) -> None:
     import win32clipboard
     from PIL import Image
-
     img = Image.open(io.BytesIO(png_bytes))
     output = io.BytesIO()
     img.convert("RGB").save(output, "BMP")

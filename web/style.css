@@ -683,30 +683,56 @@ body.compact { --btn-size: clamp(64px, 16vw, 96px); }
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .ym-btn {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(255,204,0,0.35);
   background: rgba(255,204,0,0.08);
   color: #ffcc00;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
   font-family: inherit;
   transition: transform 0.12s;
+  flex-shrink: 0;
 }
 .ym-btn:active { transform: scale(0.9); }
 .ym-btn.ym-play {
-  width: 64px;
-  height: 64px;
-  font-size: 1.5rem;
+  width: 58px;
+  height: 58px;
+  font-size: 1.4rem;
   background: linear-gradient(135deg, #ffcc00, #ff9500);
   color: #1a1000;
   border: none;
   box-shadow: 0 8px 24px rgba(255,204,0,0.4);
+}
+
+.logs-modal {
+  width: min(720px, 96vw);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.logs-body {
+  flex: 1;
+  min-height: 240px;
+  max-height: 55vh;
+  overflow: auto;
+  background: #0a0a10;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #b8b8d0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0.5rem 0 1rem;
 }
 
 .ym-search-row {

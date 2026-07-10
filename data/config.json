@@ -232,7 +232,7 @@
           "label": "D-Deaf",
           "icon": "🙉",
           "color": "#5865f2",
-          "action": { "type": "hotkey", "value": ["ctrl", "shift", "a"] }
+          "action": { "type": "hotkey", "value": ["ctrl", "shift", "m"] }
         },
         {
           "id": "s8",

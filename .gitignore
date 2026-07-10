@@ -5,4 +5,7 @@ __pycache__/
 .venv/
 venv/
 data/screenshots/
+data/logs/
 *.log
+.DS_Store
+Thumbs.db

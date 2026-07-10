@@ -47,10 +47,13 @@
           </div>
         </div>
         <div class="ym-transport">
-          <button class="ym-btn" data-ym="prev">⏮</button>
-          <button class="ym-btn ym-play" data-ym="play_pause">⏯</button>
-          <button class="ym-btn" data-ym="next">⏭</button>
-          <button class="ym-btn" data-ym="like">❤️</button>
+          <button class="ym-btn" data-ym="prev" title="Предыдущий">⏮</button>
+          <button class="ym-btn ym-play" data-ym="play_pause" title="Play/Pause">⏯</button>
+          <button class="ym-btn" data-ym="next" title="Следующий">⏭</button>
+          <button class="ym-btn" data-ym="like" title="Лайк">❤️</button>
+          <button class="ym-btn" data-ym="dislike" title="Дизлайк">👎</button>
+          <button class="ym-btn" data-ym="shuffle" title="Шаффл">🔀</button>
+          <button class="ym-btn" data-ym="repeat" title="Повтор">🔁</button>
         </div>
         <div class="ym-search-row">
           <input type="text" id="ym-search" placeholder="Найти трек, альбом, исполнителя…">
@@ -97,6 +100,8 @@
     <div id="edit-bar" class="edit-bar hidden">
       <button id="btn-add" class="btn">+ Кнопка</button>
       <button id="btn-add-page" class="btn">+ Страница</button>
+      <button id="btn-rename-page" class="btn">✎ Страница</button>
+      <button id="btn-delete-page" class="btn danger">− Страница</button>
       <button id="btn-done" class="btn primary">Готово</button>
     </div>
   </div>
@@ -226,12 +231,24 @@
         <div class="field-row settings-io">
           <button type="button" id="s-export" class="btn">Экспорт JSON</button>
           <label class="btn file-btn">Импорт JSON<input type="file" id="s-import" accept=".json" hidden></label>
+          <button type="button" id="s-logs" class="btn">Логи</button>
         </div>
         <div class="modal-actions">
           <button type="button" id="s-cancel" class="btn">Отмена</button>
           <button type="submit" class="btn primary">Сохранить</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div id="logs-overlay" class="modal-overlay hidden">
+    <div class="modal logs-modal">
+      <h2>Логи сервера</h2>
+      <pre id="logs-body" class="logs-body">Загрузка…</pre>
+      <div class="modal-actions">
+        <button type="button" id="logs-refresh" class="btn">Обновить</button>
+        <button type="button" id="logs-close" class="btn primary">Закрыть</button>
+      </div>
     </div>
   </div>
 

@@ -48,11 +48,14 @@ const OBS_OPTIONS = [
 ];
 
 const YANDEX_OPTIONS = [
-  ["browser", "Открыть в браузере"], ["play_pause", "Play / Pause"],
-  ["next", "Следующий"], ["prev", "Предыдущий"], ["like", "Лайк"],
+  ["browser", "Открыть в браузере"], ["focus", "Фокус окна"],
+  ["play_pause", "Play / Pause"], ["next", "Следующий"], ["prev", "Предыдущий"],
+  ["like", "Лайк"], ["dislike", "Дизлайк"], ["shuffle", "Шаффл"], ["repeat", "Повтор"],
+  ["mute", "Mute"], ["volume_up", "Громкость +"], ["volume_down", "Громкость -"],
+  ["fullscreen", "Плеер (W)"],
   ["my_wave", "Моя волна"], ["collection", "Коллекция"], ["playlists", "Плейлисты"],
   ["history", "История"], ["charts", "Чарты"], ["podcasts", "Подкасты"],
-  ["new_releases", "Новинки"], ["search", "Поиск (текст ниже)"],
+  ["new_releases", "Новинки"], ["kids", "Детям"], ["search", "Поиск (текст ниже)"],
 ];
 
 const HOTKEY_PRESETS = [
@@ -148,7 +151,8 @@ function renderPage() {
   const page = getActivePage();
   const chassis = document.querySelector(".deck-chassis");
   const full = $("#music-full-panel");
-  if (page?.layout === "music") {
+  // В режиме редактирования всегда сетка (можно править кнопки)
+  if (page?.layout === "music" && !editMode) {
     chassis?.classList.add("hidden");
     full?.classList.remove("hidden");
     pollYmNow();
@@ -558,13 +562,13 @@ $("#btn-edit").onclick = () => {
   editMode = !editMode;
   $("#btn-edit").classList.toggle("active", editMode);
   $("#edit-bar").classList.toggle("hidden", !editMode);
-  renderGrid();
+  renderPage();
 };
 $("#btn-done").onclick = () => {
   editMode = false;
   $("#btn-edit").classList.remove("active");
   $("#edit-bar").classList.add("hidden");
-  renderGrid();
+  renderPage();
 };
 
 $("#btn-add").onclick = () => {
@@ -581,11 +585,44 @@ $("#btn-add").onclick = () => {
 $("#btn-add-page").onclick = async () => {
   const name = prompt("Название страницы:", "Новая");
   if (!name) return;
+  const themePick = prompt("Тема: default / stream / yandex (пусто = default)", "default") || "default";
+  const theme = ["stream", "yandex"].includes(themePick.trim().toLowerCase())
+    ? themePick.trim().toLowerCase()
+    : undefined;
   const id = "page_" + Math.random().toString(36).slice(2, 10);
-  config.pages.push({ id, name, buttons: [] });
+  const page = { id, name: name.trim(), buttons: [] };
+  if (theme) {
+    page.theme = theme;
+    if (theme === "yandex") page.layout = "music";
+  }
+  config.pages.push(page);
   navigateToPage(id);
   await saveConfig();
 };
+
+$("#btn-rename-page")?.addEventListener("click", async () => {
+  const page = getActivePage();
+  if (!page) return;
+  const name = prompt("Новое название страницы:", page.name);
+  if (!name || !name.trim()) return;
+  page.name = name.trim();
+  renderTabs();
+  await saveConfig();
+});
+
+$("#btn-delete-page")?.addEventListener("click", async () => {
+  if (config.pages.length <= 1) {
+    toast("Нельзя удалить последнюю страницу");
+    return;
+  }
+  const page = getActivePage();
+  if (!page || !confirm(`Удалить страницу «${page.name}»?`)) return;
+  config.pages = config.pages.filter((p) => p.id !== page.id);
+  activePageId = config.pages[0].id;
+  config.activePage = activePageId;
+  applyConfig(config);
+  await saveConfig();
+});
 
 $("#f-type").onchange = updateValueField;
 $("#f-value-select").onchange = () => {
@@ -709,6 +746,23 @@ $("#s-import").onchange = async (e) => {
   } catch { toast("Ошибка JSON"); }
   e.target.value = "";
 };
+
+$("#s-logs")?.addEventListener("click", async () => {
+  try {
+    const headers = {};
+    if (pin) headers["X-Deck-Pin"] = pin;
+    const text = await fetch("/api/logs?lines=200", { headers }).then((r) => {
+      if (!r.ok) throw new Error();
+      return r.text();
+    });
+    $("#logs-body").textContent = text || "Логов пока нет";
+    $("#logs-overlay").classList.remove("hidden");
+  } catch {
+    toast("Не удалось загрузить логи");
+  }
+});
+$("#logs-close")?.addEventListener("click", () => $("#logs-overlay").classList.add("hidden"));
+$("#logs-refresh")?.addEventListener("click", () => $("#s-logs")?.click());
 
 document.querySelectorAll("[data-ym]").forEach((el) => {
   el.addEventListener("click", () => execYandex(el.dataset.ym));
