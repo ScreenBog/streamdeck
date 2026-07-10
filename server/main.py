@@ -42,6 +42,11 @@ class YandexRequest(BaseModel):
     query: str = ""
 
 
+class AudioRequest(BaseModel):
+    action: str = "get"  # get | set | up | down | mute | mute_on | mute_off
+    value: float | int | None = None  # level 0-100 or delta
+
+
 def get_lan_ip() -> str:
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -116,13 +121,42 @@ async def api_put_config(body: ConfigUpdate, x_deck_pin: str | None = Header(Non
 
 @app.get("/api/status")
 def api_status():
+    from .audio_ctrl import get_volume
+    from .yandex_music import get_status as ym_status
+
+    out: dict[str, Any] = {"cpu": 0, "ram": 0, "online": True}
     try:
         import psutil
-        cpu = psutil.cpu_percent(interval=0.1)
-        mem = psutil.virtual_memory().percent
-        return {"cpu": round(cpu, 1), "ram": round(mem, 1), "online": True}
+        out["cpu"] = round(psutil.cpu_percent(interval=0.05), 1)
+        out["ram"] = round(psutil.virtual_memory().percent, 1)
     except Exception:
-        return {"cpu": 0, "ram": 0, "online": True}
+        pass
+    try:
+        out["audio"] = get_volume()
+    except Exception:
+        out["audio"] = {"level": 50, "muted": False, "ok": False}
+    try:
+        out["now"] = ym_status()
+    except Exception:
+        out["now"] = None
+    return out
+
+
+@app.get("/api/audio")
+def api_audio_get(x_deck_pin: str | None = Header(None)):
+    check_pin(x_deck_pin)
+    from .audio_ctrl import get_volume
+    return get_volume()
+
+
+@app.post("/api/audio")
+async def api_audio_post(body: AudioRequest, x_deck_pin: str | None = Header(None)):
+    check_pin(x_deck_pin)
+    from .audio_ctrl import run_audio
+
+    result = await asyncio.to_thread(run_audio, body.action, body.value)
+    await broadcast({"type": "audio", "audio": result})
+    return result
 
 
 @app.get("/api/logs", response_class=PlainTextResponse)

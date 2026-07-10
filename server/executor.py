@@ -33,7 +33,8 @@ def execute(action: dict[str, Any], settings: dict[str, Any] | None = None) -> d
         "text": _text, "media": _media, "system": _system, "path": _path,
         "macro": _macro, "folder": _folder, "screenshot": _screenshot,
         "clipboard": _clipboard, "mouse": _mouse, "window": _window,
-        "obs": _obs, "yandex": _yandex, "none": _none,
+        "obs": _obs, "yandex": _yandex, "audio": _audio, "volume": _audio,
+        "brightness": _brightness, "none": _none,
     }
 
     handler = handlers.get(action_type)
@@ -119,21 +120,81 @@ def _text(value: Any, _action: dict, _settings: dict) -> str:
     return f"📝 {len(text)} симв."
 
 
-def _media(value: Any, _action: dict, _settings: dict) -> str:
+def _media(value: Any, action: dict, _settings: dict) -> str | dict:
+    from .audio_ctrl import change_volume, toggle_mute, set_volume, get_volume
+
+    key = str(value).strip().lower()
+    # точная громкость через Core Audio
+    if key in ("volume_up", "vol+", "+"):
+        step = int(action.get("step", 5))
+        return change_volume(step)
+    if key in ("volume_down", "vol-", "-"):
+        step = int(action.get("step", 5))
+        return change_volume(-step)
+    if key in ("mute", "volume_mute"):
+        return toggle_mute()
+    if key.startswith("volume_") and key[7:].isdigit():
+        return set_volume(int(key[7:]))
+    if key in ("volume_get", "volume_status"):
+        st = get_volume()
+        return {**st, "message": f"{'🔇' if st.get('muted') else '🔊'} {st.get('level', 0)}%"}
+
     actions = {
-        "volume_up": (lambda: [keyboard_win.press("volumeup") for _ in range(3)], "🔊 +"),
-        "volume_down": (lambda: [keyboard_win.press("volumedown") for _ in range(3)], "🔉 -"),
-        "mute": (lambda: keyboard_win.press("volumemute"), "🔇 Mute"),
         "play_pause": (lambda: keyboard_win.press("playpause"), "⏯ Play/Pause"),
         "next": (lambda: keyboard_win.press("nexttrack"), "⏭ Next"),
         "prev": (lambda: keyboard_win.press("prevtrack"), "⏮ Prev"),
         "mic_mute": (lambda: keyboard_win.hotkey(["win", "alt", "k"]), "🎤 Mic toggle"),
+        "stop": (lambda: keyboard_win.press("playpause"), "⏹ Stop/Pause"),
     }
-    key = str(value).strip().lower()
     if key not in actions:
         raise ValueError(f"media: неизвестное действие {key}")
     actions[key][0]()
     return actions[key][1]
+
+
+def _audio(value: Any, action: dict, _settings: dict) -> dict:
+    from .audio_ctrl import run_audio
+
+    # value: "50" | "set" | "up" | "down" | "mute"
+    key = str(value or action.get("action") or "get").strip().lower()
+    level = action.get("level", action.get("step"))
+    if key.isdigit():
+        return run_audio("set", int(key))
+    if key in ("set", "level") and level is not None:
+        return run_audio("set", level)
+    if key in ("up", "down") and level is not None:
+        return run_audio(key, level)
+    return run_audio(key, level)
+
+
+def _brightness(value: Any, action: dict, _settings: dict) -> str:
+    """Яркость экрана 0–100 (WMI) или hotkeys."""
+    key = str(value or "").strip().lower()
+    level = action.get("level")
+    try:
+        if key.isdigit():
+            level = int(key)
+        if level is not None or key in ("set", "level"):
+            pct = max(0, min(100, int(level if level is not None else 50)))
+            # WMI method via powershell
+            ps = (
+                f"(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods)"
+                f".WmiSetBrightness(1,{pct})"
+            )
+            subprocess.run(
+                ["powershell", "-NoProfile", "-Command", ps],
+                capture_output=True, timeout=8, check=False,
+            )
+            return f"☀️ Яркость {pct}%"
+        if key in ("up", "+"):
+            keyboard_win.press("f6")  # laptop-dependent; also try
+            return "☀️ Яркость +"
+        if key in ("down", "-"):
+            keyboard_win.press("f5")
+            return "☀️ Яркость -"
+    except Exception as e:
+        logger.warning("brightness: {}", e)
+    raise ValueError("brightness: укажите 0–100 или up/down")
 
 
 def _system(value: Any, _action: dict, _settings: dict) -> str | dict:

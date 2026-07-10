@@ -54,7 +54,7 @@
           "label": "Vol +",
           "icon": "🔊",
           "color": "#2d4a22",
-          "action": { "type": "media", "value": "volume_up" }
+          "action": { "type": "audio", "value": "up" }
         },
         {
           "id": "b4",
@@ -63,7 +63,7 @@
           "label": "Mute",
           "icon": "🔇",
           "color": "#4a2d2d",
-          "action": { "type": "media", "value": "mute" }
+          "action": { "type": "audio", "value": "mute" }
         },
         {
           "id": "b5",

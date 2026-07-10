@@ -10,3 +10,5 @@ websocket-client>=1.8
 pywin32>=306
 winsdk>=1.0.0b9
 loguru>=0.7.2
+pycaw>=20240210
+comtypes>=1.4

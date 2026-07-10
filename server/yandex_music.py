@@ -58,15 +58,34 @@ def run(action: str, value: str = "", settings: dict | None = None) -> str:
     if key == "repeat":
         return _media_ctrl("Повтор", None, lambda: keyboard_win.press("r"))
     if key == "mute":
-        return _media_ctrl("Mute", None, lambda: keyboard_win.press("m"))
+        try:
+            if _focus_browser():
+                keyboard_win.press("m")
+                _return_focus()
+                return "🔇 Mute плеера"
+        except Exception:
+            pass
+        from .audio_ctrl import toggle_mute
+        st = toggle_mute()
+        return st.get("message", "🔇 Mute")
     if key == "fullscreen" or key == "player":
         return _media_ctrl("Плеер", None, lambda: keyboard_win.press("w"))
     if key == "volume_up":
-        keyboard_win.press_media("volumeup")
-        return "+"
+        from .audio_ctrl import change_volume
+        st = change_volume(5)
+        return st.get("message", f"🔊 {st.get('level', '')}%")
     if key == "volume_down":
-        keyboard_win.press_media("volumedown")
-        return "-"
+        from .audio_ctrl import change_volume
+        st = change_volume(-5)
+        return st.get("message", f"🔉 {st.get('level', '')}%")
+    if key in ("volume_set", "set_volume"):
+        from .audio_ctrl import set_volume
+        try:
+            level = int(float(query or "50"))
+        except ValueError:
+            level = 50
+        st = set_volume(level)
+        return st.get("message", f"🔊 {level}%")
     if key == "my_wave":
         return _open_page(MY_WAVE_URL, "Моя волна", settings, play=True)
     if key == "collection":
@@ -94,6 +113,9 @@ def run(action: str, value: str = "", settings: dict | None = None) -> str:
 
 
 def get_status() -> dict:
+    from .audio_ctrl import get_volume
+
+    audio = get_volume()
     info = get_media_info()
     if info and info.get("track") and info["track"] != "—":
         return {
@@ -104,10 +126,9 @@ def get_status() -> dict:
             "album": info.get("album", ""),
             "raw": info.get("app", ""),
             "source": "windows",
+            "volume": audio.get("level", 50),
+            "muted": audio.get("muted", False),
         }
-
-    if _focus_browser():
-        pass
 
     return {
         "playing": False,
@@ -117,6 +138,8 @@ def get_status() -> dict:
         "album": "",
         "raw": "",
         "source": "none",
+        "volume": audio.get("level", 50),
+        "muted": audio.get("muted", False),
     }
 
 
