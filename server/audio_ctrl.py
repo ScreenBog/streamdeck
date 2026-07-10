@@ -7,13 +7,27 @@ from typing import Any
 from .logger import logger
 
 
+def _ensure_com() -> None:
+    """COM обязателен в worker-потоках FastAPI/asyncio.to_thread."""
+    try:
+        import pythoncom
+        pythoncom.CoInitialize()
+    except Exception:
+        try:
+            import comtypes
+            comtypes.CoInitialize()
+        except Exception:
+            pass
+
+
 def _endpoint():
     """IAudioEndpointVolume через pycaw (новый API: device.EndpointVolume)."""
+    _ensure_com()
     from pycaw.pycaw import AudioUtilities
 
     speakers = AudioUtilities.GetSpeakers()
     # pycaw 2024+: AudioDevice.EndpointVolume; старый: Activate(...)
-    if hasattr(speakers, "EndpointVolume"):
+    if hasattr(speakers, "EndpointVolume") and speakers.EndpointVolume is not None:
         return speakers.EndpointVolume
     from comtypes import CLSCTX_ALL
     from comtypes import cast, POINTER
